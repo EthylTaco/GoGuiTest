@@ -2,4 +2,4 @@ module WebS
 
 go 1.17
 
-require github.com/gorilla/websocket v1.4.2 // indirect
+require golang.org/x/net v0.0.0-20211020060615-d418f374d309

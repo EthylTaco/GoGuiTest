@@ -1,32 +1,29 @@
-package WebS
+package main
 
 import (
-	"github.com/gorilla/websocket"
+	"fmt"
+	"golang.org/x/net/websocket"
 	"log"
-	"net/http"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+func main()  {
+	origin := "http://localhost/"
+	url := "ws://localhost:9001/ws"
+	ws, err := websocket.Dial(url, "", origin)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
-	for {
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}
+	if _, err := ws.Write([]byte("hello, world!")); err != nil {
+		log.Fatal(err)
 	}
-
+	var recv = make([]byte, 512)
+	var n int
+	if n, err = ws.Read(recv); err != nil {
+		log.Fatal(err)
+	}
+	msg := fmt.Sprintf("%s", recv[:n])
+	fmt.Printf("Received: %s.\n", msg)
+	if msg == "a" {
+		if _, err := ws.Write([]byte("you have pressed 'a.' ")); err != nil {log.Fatal(err)}
+	}
 }
